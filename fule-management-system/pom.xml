@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>lk.esoft</groupId>
 	<artifactId>fule-management-system</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>fule-management-system</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -29,7 +29,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -77,5 +76,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
