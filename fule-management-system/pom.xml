@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>lk.esoft</groupId>
 	<artifactId>fule-management-system</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>fule-management-system</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -29,7 +29,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5afe453 (Initial commit)
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -60,7 +63,10 @@
 			<version>2.4.4</version>
 		</dependency>
     </dependencies>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5afe453 (Initial commit)
 	<build>
 		<plugins>
 			<plugin>
@@ -77,5 +83,8 @@
 			</plugin>
 		</plugins>
 	</build>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5afe453 (Initial commit)
 </project>
