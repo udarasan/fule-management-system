@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class UserRoleDTO {
-    private int UserRoleCode;
-    private String UserRoleDesc;
+    private int userRoleCode;
+    private String userRoleDesc;
 }

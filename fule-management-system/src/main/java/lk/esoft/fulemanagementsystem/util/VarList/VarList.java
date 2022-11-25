@@ -10,7 +10,7 @@ public class VarList {
     public static final int Switching_Protocols = 101;
     public static final int Early_Hints = 103;
     public static final int OK = 200;
-    public static final int Created = 200;
+    public static final int Created = 201;
     public static final int Accepted = 202;
     public static final int Non_Authoritative_Information = 203;
     public static final int No_Content = 204;

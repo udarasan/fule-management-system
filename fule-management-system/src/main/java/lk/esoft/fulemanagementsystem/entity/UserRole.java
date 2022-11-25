@@ -20,6 +20,6 @@ import javax.persistence.Table;
 @Table(name = "userrole")
 public class UserRole {
     @Id
-    private int UserRoleCode;
-    private String UserRoleDesc;
+    private int userRoleCode;
+    private String userRoleDesc;
 }

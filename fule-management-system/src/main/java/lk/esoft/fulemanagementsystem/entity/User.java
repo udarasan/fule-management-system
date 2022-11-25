@@ -28,7 +28,7 @@ public class User implements Serializable {
     private String email;
     private String name;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne
     @JoinColumn(name = "roleCode", referencedColumnName = "UserRoleCode")
     private UserRole roleCode;
 
