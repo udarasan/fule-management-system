@@ -38,7 +38,7 @@ public class FuelTokenController {
                 return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
             } else if (res==404) {
                 responseDTO.setCode(VarList.Not_Found);
-                responseDTO.setMessage("Username Already Use");
+                responseDTO.setMessage("TokenID Already Use");
                 responseDTO.setData(null);
                 return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
             } else {
