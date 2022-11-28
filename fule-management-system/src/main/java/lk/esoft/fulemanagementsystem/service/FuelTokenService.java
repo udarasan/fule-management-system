@@ -9,4 +9,13 @@ import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
  */
 public interface FuelTokenService {
     int generateToken(FuelTokenDTO fuelTokenDTO);
+
+    int generateTokenInFirstTime(FuelTokenDTO fuelTokenDTO);
+
+    int getAvailableBalance(Integer vehicleRegNo);
+
+    boolean vehicleRegNoExists(Integer vehicleRegNo);
+
+
+    int getAvailableBalanceInStation(Integer fid);
 }

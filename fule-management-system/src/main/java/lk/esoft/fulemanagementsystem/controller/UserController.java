@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/user")
 public class UserController {
@@ -185,25 +188,26 @@ public class UserController {
         }
     }
 
-
+*/
     @GetMapping("/getAllUsers")
-    public ResponseEntity<ResponseDTO> getAllUsers(@RequestAttribute String username,@RequestAttribute String role) {
+    public ResponseEntity<ResponseDTO> getAllUsers() {
+        System.out.println("username");
         try{
-            System.out.println(username);
-            System.out.println(role);
+
+            //System.out.println(role);
             List<UserDTO> userDTOList = userService.getAllUsers();
-            responseDTO.setCode(VarListUtil.RSP_SUCCESS);
+            responseDTO.setCode(VarList.Created);
             responseDTO.setMessage("Success");
-            responseDTO.setContent(userDTOList);
+            responseDTO.setData(userDTOList);
             return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
         }catch (Exception e){
-            responseDTO.setCode(VarListUtil.RSP_ERROR);
+            responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage(e.getMessage());
-            responseDTO.setContent(e);
+            responseDTO.setData(e);
             return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
-*/
+
 }

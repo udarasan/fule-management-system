@@ -24,5 +24,10 @@ public class FuelStation {
     private String stationName;
     private String city;
     private String district;
+    private int max_limit;
+    private int available_limit;
+    private int customer_requested_limit;
+    private String status;
+    private int station_requested_limit;
 
 }

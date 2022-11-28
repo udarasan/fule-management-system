@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="fulemanagementsystem@localhost" uuid="2a6ab1e2-2728-49db-abd5-8a195baca543">
+    <data-source source="LOCAL" name="fulemgtsystem@localhost" uuid="ace080d2-b0ed-47c1-bc9c-c7aeb6c7c56f">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/fulemanagementsystem</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/fulemgtsystem</jdbc-url>
     </data-source>
   </component>
 </project>

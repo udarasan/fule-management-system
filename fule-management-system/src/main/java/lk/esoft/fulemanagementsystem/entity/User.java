@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Udara San
@@ -31,5 +32,8 @@ public class User implements Serializable {
     @OneToOne
     @JoinColumn(name = "roleCode", referencedColumnName = "UserRoleCode")
     private UserRole roleCode;
+
+    /*@OneToMany(cascade=CascadeType.ALL,mappedBy = "username")
+    private List<Vehicle> vehicleNo;*/
 
 }

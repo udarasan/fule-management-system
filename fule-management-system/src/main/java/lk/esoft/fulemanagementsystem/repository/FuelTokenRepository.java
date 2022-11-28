@@ -12,4 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FuelTokenRepository extends JpaRepository<FuelToken,Integer> {
 
 
+    boolean existsByVehicleRegNo(Integer vehicleRegNo);
+
 }
