@@ -83,7 +83,7 @@ public class FuelTokenController {
 
                         }else {
                             responseDTO.setCode(VarList.Not_Acceptable);
-                            responseDTO.setMessage("This Station fuel Almost Finished Now!");
+                            responseDTO.setMessage("This Station fuel Almost Finished Now! No Any Schedule Delivery");
                             responseDTO.setData(null);
                             return new ResponseEntity<>(responseDTO, HttpStatus.NOT_ACCEPTABLE);
                         }
