@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
 
 /**
  * @author Udara San
@@ -42,19 +43,23 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             return VarList.Not_Found;
         } else {
 
-            int availableBalance=vehicleRepository.getAvailableBalance(fuelTokenDTO.getVehicleRegNo());
-
-            int newBalance=availableBalance-fuelTokenDTO.getRequestQuota();
-
-
-            Vehicle vehicle=new Vehicle();
+            //update vehicle weekly limit
+            int availableBalance = vehicleRepository.getAvailableBalance(fuelTokenDTO.getVehicleRegNo());
+            int newBalance = availableBalance - fuelTokenDTO.getRequestQuota();
+            Vehicle vehicle = new Vehicle();
             vehicle.setVehicle_no(fuelTokenDTO.getVehicleRegNo());
             vehicle.setAvailable_quota(newBalance);
             vehicle.setUsername_Fk(fuelTokenDTO.getUsernameFk().getUsername());
-
-
-
             vehicleRepository.save(vehicle);
+            //update fuel station available stock
+            int stationAvailability=fuelStationRepository.getAvailableBalance(fuelTokenDTO.getFuelStationFk().getFid());
+            int requestQuota = fuelTokenDTO.getRequestQuota();
+            int newAvailability=stationAvailability-requestQuota;
+            int customerRequestedLimit=fuelStationRepository.getCustomerRequestQuota(fuelTokenDTO.getFuelStationFk().getFid());
+            int newCustomerRequestedLimit=customerRequestedLimit+requestQuota;
+            fuelStationRepository.updateFuelStationBalances(newAvailability,newCustomerRequestedLimit,fuelTokenDTO.getFuelStationFk().getFid());
+
+            //create fuel token
             fuelTokenRepository.save(modelMapper.map(fuelTokenDTO, FuelToken.class));
             return VarList.Created;
         }
@@ -65,7 +70,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
         if (fuelTokenRepository.existsById(fuelTokenDTO.getTid())) {
             return VarList.Not_Found;
         } else {
-            Vehicle vehicle=new Vehicle();
+            Vehicle vehicle = new Vehicle();
             vehicle.setVehicle_no(fuelTokenDTO.getVehicleRegNo());
             vehicle.setAvailable_quota(20);
             vehicle.setUsername_Fk(fuelTokenDTO.getUsernameFk().getUsername());
@@ -91,6 +96,17 @@ public class FuelTokenServiceImpl implements FuelTokenService {
     @Override
     public int getAvailableBalanceInStation(Integer fid) {
         return fuelStationRepository.getAvailableBalance(fid);
+    }
+
+    @Override
+    public boolean checkFuelRequestAvailability(int fid) {
+        HashMap<String, Object> map=fuelStationRepository.checkFuelRequestAvailability(fid);
+
+        if (map.get("status").equals("ACCEPTED")){
+            return true;
+        }else {
+            return false;
+        }
     }
 
 }

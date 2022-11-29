@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+
 /**
  * @author Udara San
  * @TimeStamp 11:11 PM | 11/25/2022 | 2022
@@ -58,7 +60,34 @@ public class FuelTokenController {
                         }
                     } else {
                         //check schedule delivery available or not
-                        return null;
+
+                        if (fuelTokenService.checkFuelRequestAvailability(fuelTokenDTO.getFuelStationFk().getFid())){
+
+                            int res = fuelTokenService.generateToken(fuelTokenDTO);
+                            if (res == 201) {
+                                responseDTO.setCode(VarList.Created);
+                                responseDTO.setMessage("success");
+                                responseDTO.setData(fuelTokenDTO);
+                                return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+                            } else if (res == 404) {
+                                responseDTO.setCode(VarList.Not_Found);
+                                responseDTO.setMessage("TokenID Already Use");
+                                responseDTO.setData(null);
+                                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+                            } else {
+                                responseDTO.setCode(VarList.Bad_Gateway);
+                                responseDTO.setMessage("Error");
+                                responseDTO.setData(null);
+                                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_GATEWAY);
+                            }
+
+                        }else {
+                            responseDTO.setCode(VarList.Not_Acceptable);
+                            responseDTO.setMessage("This Station fuel Almost Finished Now!");
+                            responseDTO.setData(null);
+                            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_ACCEPTABLE);
+                        }
+
                     }
                 } else {
                     responseDTO.setCode(VarList.Not_Acceptable);

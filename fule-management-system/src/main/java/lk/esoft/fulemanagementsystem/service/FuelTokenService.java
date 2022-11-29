@@ -2,6 +2,8 @@ package lk.esoft.fulemanagementsystem.service;
 
 import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
 
+import java.util.HashMap;
+
 /**
  * @author Udara San
  * @TimeStamp 11:12 PM | 11/25/2022 | 2022
@@ -18,4 +20,6 @@ public interface FuelTokenService {
 
 
     int getAvailableBalanceInStation(Integer fid);
+
+    boolean checkFuelRequestAvailability(int fid);
 }
