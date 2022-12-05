@@ -25,5 +25,6 @@ public class Payment {
     private Integer pid;
     private String paymentStatus;
     private Date paymentDate;
+    private double price;
 
 }

@@ -12,6 +12,7 @@ import lk.esoft.fulemanagementsystem.repository.FuelTokenRepository;
 import lk.esoft.fulemanagementsystem.repository.VehicleRepository;
 import lk.esoft.fulemanagementsystem.service.FuelTokenService;
 import lk.esoft.fulemanagementsystem.util.QRCodeGenerator;
+import lk.esoft.fulemanagementsystem.util.VarList.BusinessLogicVarList;
 import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -73,6 +74,8 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             int newCustomerRequestedLimit = customerRequestedLimit + requestQuota;
             fuelStationRepository.updateFuelStationBalances(newAvailability, newCustomerRequestedLimit, fuelTokenDTO.getFuelStationFk().getFid());
 
+            //set Price
+            fuelTokenDTO.getPidFk().setPrice(fuelPriceCalculation(fuelTokenDTO.getRequestQuota()));
             //create fuel token
             fuelTokenRepository.save(modelMapper.map(fuelTokenDTO, FuelToken.class));
 
@@ -111,7 +114,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             vehicle.setVehicle_no(fuelTokenDTO.getVehicleRegNo());
             vehicle.setAvailable_quota(20);
             vehicle.setUsername_Fk(fuelTokenDTO.getUsernameFk().getUsername());
-
+            fuelTokenDTO.getPidFk().setPrice(fuelPriceCalculation(fuelTokenDTO.getRequestQuota()));
             vehicleRepository.save(vehicle);
             fuelTokenRepository.save(modelMapper.map(fuelTokenDTO, FuelToken.class));
            /* String qr=generateQRString(fuelTokenDTO);
@@ -183,6 +186,10 @@ public class FuelTokenServiceImpl implements FuelTokenService {
         }
 
         return fuelTokenResponseDTO;
+    }
+
+    private double fuelPriceCalculation(int requestQuota){
+        return requestQuota * BusinessLogicVarList.OneLiter;
     }
 
 }
