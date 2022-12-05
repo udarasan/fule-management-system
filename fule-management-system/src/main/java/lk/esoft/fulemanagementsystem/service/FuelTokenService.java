@@ -1,8 +1,10 @@
 package lk.esoft.fulemanagementsystem.service;
 
 import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
+import lk.esoft.fulemanagementsystem.dto.FuelTokenResponseDTO;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Udara San
@@ -22,4 +24,9 @@ public interface FuelTokenService {
     int getAvailableBalanceInStation(Integer fid);
 
     boolean checkFuelRequestAvailability(int fid);
+
+    List<FuelTokenDTO> getAllTokenByUsername(String username);
+
+
+    FuelTokenResponseDTO getAllQRandDetails(String username);
 }

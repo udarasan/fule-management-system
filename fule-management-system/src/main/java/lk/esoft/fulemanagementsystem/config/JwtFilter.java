@@ -8,10 +8,14 @@ package lk.esoft.fulemanagementsystem.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import lk.esoft.fulemanagementsystem.dto.ResponseDTO;
 import lk.esoft.fulemanagementsystem.service.impl.UserServiceImpl;
 import lk.esoft.fulemanagementsystem.util.JwtUtil;
+import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +40,9 @@ JwtFilter extends OncePerRequestFilter {
     private UserServiceImpl userService;
     @Value("${jwt.secret}")
     private String secretKey;
+
+    @Autowired
+    private ResponseDTO responseDTO;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {

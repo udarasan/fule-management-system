@@ -1,11 +1,13 @@
 package lk.esoft.fulemanagementsystem.repository;
 
 import lk.esoft.fulemanagementsystem.entity.FuelStation;
+import lk.esoft.fulemanagementsystem.entity.FuelToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Udara San
@@ -36,5 +38,6 @@ public interface FuelStationRepository extends JpaRepository<FuelStation,Integer
         }
         return dataMap;
     }
+
 
 }

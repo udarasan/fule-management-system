@@ -1,19 +1,28 @@
 package lk.esoft.fulemanagementsystem.service.impl;
 
+import com.google.zxing.WriterException;
 import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
+import lk.esoft.fulemanagementsystem.dto.FuelTokenResponseDTO;
+import lk.esoft.fulemanagementsystem.dto.UserDTO;
 import lk.esoft.fulemanagementsystem.entity.FuelToken;
+import lk.esoft.fulemanagementsystem.entity.User;
 import lk.esoft.fulemanagementsystem.entity.Vehicle;
 import lk.esoft.fulemanagementsystem.repository.FuelStationRepository;
 import lk.esoft.fulemanagementsystem.repository.FuelTokenRepository;
 import lk.esoft.fulemanagementsystem.repository.VehicleRepository;
 import lk.esoft.fulemanagementsystem.service.FuelTokenService;
+import lk.esoft.fulemanagementsystem.util.QRCodeGenerator;
 import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Udara San
@@ -37,9 +46,14 @@ public class FuelTokenServiceImpl implements FuelTokenService {
     @Autowired
     private FuelStationRepository fuelStationRepository;
 
+
     @Override
     public int generateToken(FuelTokenDTO fuelTokenDTO) {
+
+        //FuelTokenResponseDTO fuelTokenResponseDTO=new FuelTokenResponseDTO();
+
         if (fuelTokenRepository.existsById(fuelTokenDTO.getTid())) {
+            //fuelTokenResponseDTO.setQrString(null);
             return VarList.Not_Found;
         } else {
 
@@ -52,22 +66,45 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             vehicle.setUsername_Fk(fuelTokenDTO.getUsernameFk().getUsername());
             vehicleRepository.save(vehicle);
             //update fuel station available stock
-            int stationAvailability=fuelStationRepository.getAvailableBalance(fuelTokenDTO.getFuelStationFk().getFid());
+            int stationAvailability = fuelStationRepository.getAvailableBalance(fuelTokenDTO.getFuelStationFk().getFid());
             int requestQuota = fuelTokenDTO.getRequestQuota();
-            int newAvailability=stationAvailability-requestQuota;
-            int customerRequestedLimit=fuelStationRepository.getCustomerRequestQuota(fuelTokenDTO.getFuelStationFk().getFid());
-            int newCustomerRequestedLimit=customerRequestedLimit+requestQuota;
-            fuelStationRepository.updateFuelStationBalances(newAvailability,newCustomerRequestedLimit,fuelTokenDTO.getFuelStationFk().getFid());
+            int newAvailability = stationAvailability - requestQuota;
+            int customerRequestedLimit = fuelStationRepository.getCustomerRequestQuota(fuelTokenDTO.getFuelStationFk().getFid());
+            int newCustomerRequestedLimit = customerRequestedLimit + requestQuota;
+            fuelStationRepository.updateFuelStationBalances(newAvailability, newCustomerRequestedLimit, fuelTokenDTO.getFuelStationFk().getFid());
 
             //create fuel token
             fuelTokenRepository.save(modelMapper.map(fuelTokenDTO, FuelToken.class));
+
+            /*String qr=generateQRString(fuelTokenDTO);
+            try {
+                byte[] qrimage=QRCodeGenerator.getQRCodeImage(qr,200,200);
+                fuelTokenResponseDTO.setQrString(qrimage);
+            } catch (WriterException e) {
+                e.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }*/
             return VarList.Created;
         }
     }
 
+    private String generateQRString(FuelTokenDTO fuelTokenDTO) {
+        String s = "" + fuelTokenDTO.getTid().toString() + "" + fuelTokenDTO.getFillingTimeAndDate().toString() + "" +
+                fuelTokenDTO.getRequestQuota().toString() + "" +
+                fuelTokenDTO.getStatus() + "" +
+                fuelTokenDTO.getTokenExpDate().toString() + "" +
+                fuelTokenDTO.getVehicleRegNo().toString() + "" +
+                fuelTokenDTO.getFuelStationFk().getFid().toString() + "" +
+                fuelTokenDTO.getPidFk().getPid().toString() + "" + fuelTokenDTO.getUsernameFk().getUsername() + "";
+        return s;
+    }
+
     @Override
     public int generateTokenInFirstTime(FuelTokenDTO fuelTokenDTO) {
+        FuelTokenResponseDTO fuelTokenResponseDTO = new FuelTokenResponseDTO();
         if (fuelTokenRepository.existsById(fuelTokenDTO.getTid())) {
+            //fuelTokenResponseDTO.setQrString(null);
             return VarList.Not_Found;
         } else {
             Vehicle vehicle = new Vehicle();
@@ -77,6 +114,15 @@ public class FuelTokenServiceImpl implements FuelTokenService {
 
             vehicleRepository.save(vehicle);
             fuelTokenRepository.save(modelMapper.map(fuelTokenDTO, FuelToken.class));
+           /* String qr=generateQRString(fuelTokenDTO);
+            try {
+                byte[] qrimage=QRCodeGenerator.getQRCodeImage(qr,200,200);
+                fuelTokenResponseDTO.setQrString(qrimage);
+            } catch (WriterException e) {
+                e.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }*/
             return VarList.Created;
         }
     }
@@ -100,13 +146,43 @@ public class FuelTokenServiceImpl implements FuelTokenService {
 
     @Override
     public boolean checkFuelRequestAvailability(int fid) {
-        HashMap<String, Object> map=fuelStationRepository.checkFuelRequestAvailability(fid);
+        HashMap<String, Object> map = fuelStationRepository.checkFuelRequestAvailability(fid);
 
-        if (map.get("status").equals("ACCEPTED")){
+        if (map.get("status").equals("ACCEPTED")) {
             return true;
-        }else {
+        } else {
             return false;
         }
+    }
+
+    @Override
+    public List<FuelTokenDTO> getAllTokenByUsername(String username) {
+
+        List<FuelToken> fuelTokenDTOList = fuelTokenRepository.getAllTokenByUsername(username);
+
+        return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<FuelTokenDTO>>() {
+        }.getType());
+
+    }
+
+    @Override
+    public FuelTokenResponseDTO getAllQRandDetails(String username) {
+        FuelTokenResponseDTO fuelTokenResponseDTO = new FuelTokenResponseDTO();
+        FuelTokenDTO fuelTokenDTO = modelMapper.map(fuelTokenRepository.getQRGeneratingToken(username), FuelTokenDTO.class);
+        String qr = generateQRString(fuelTokenDTO);
+        try {
+            byte[] qrimage = QRCodeGenerator.getQRCodeImage(qr, 200, 200);
+            fuelTokenResponseDTO.setQrString(qrimage);
+
+            // TODO: 12/5/2022 SET AVAILABLE QUOTA
+            //fuelTokenResponseDTO.getAvailableQuota();
+        } catch (WriterException e) {
+            e.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return fuelTokenResponseDTO;
     }
 
 }

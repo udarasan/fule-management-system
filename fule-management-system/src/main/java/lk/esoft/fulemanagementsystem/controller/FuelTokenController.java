@@ -1,18 +1,18 @@
 package lk.esoft.fulemanagementsystem.controller;
 
 import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
+import lk.esoft.fulemanagementsystem.dto.FuelTokenResponseDTO;
 import lk.esoft.fulemanagementsystem.dto.ResponseDTO;
+import lk.esoft.fulemanagementsystem.dto.UserDTO;
 import lk.esoft.fulemanagementsystem.service.FuelTokenService;
 import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.List;
+
 
 /**
  * @author Udara San
@@ -42,21 +42,21 @@ public class FuelTokenController {
                     if (availableLittersInStation >= fuelTokenDTO.getRequestQuota()) {
                         //generata token
                         int res = fuelTokenService.generateToken(fuelTokenDTO);
-                        if (res == 201) {
+                        if (res==201) {
                             responseDTO.setCode(VarList.Created);
                             responseDTO.setMessage("success");
                             responseDTO.setData(fuelTokenDTO);
                             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-                        } else if (res == 404) {
+                        } else if (res==404) {
                             responseDTO.setCode(VarList.Not_Found);
-                            responseDTO.setMessage("TokenID Already Use");
+                            responseDTO.setMessage("Username Already Use");
                             responseDTO.setData(null);
                             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-                        } else {
-                            responseDTO.setCode(VarList.Bad_Gateway);
-                            responseDTO.setMessage("Error");
+                        }  else {
+                            responseDTO.setCode(VarList.Internal_Server_Error);
+                            responseDTO.setMessage("QR Generation Fail");
                             responseDTO.setData(null);
-                            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_GATEWAY);
+                            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
                         }
                     } else {
                         //check schedule delivery available or not
@@ -64,21 +64,21 @@ public class FuelTokenController {
                         if (fuelTokenService.checkFuelRequestAvailability(fuelTokenDTO.getFuelStationFk().getFid())){
 
                             int res = fuelTokenService.generateToken(fuelTokenDTO);
-                            if (res == 201) {
+                            if (res==201) {
                                 responseDTO.setCode(VarList.Created);
                                 responseDTO.setMessage("success");
                                 responseDTO.setData(fuelTokenDTO);
                                 return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-                            } else if (res == 404) {
+                            } else if (res==404) {
                                 responseDTO.setCode(VarList.Not_Found);
-                                responseDTO.setMessage("TokenID Already Use");
+                                responseDTO.setMessage("Username Already Use");
                                 responseDTO.setData(null);
                                 return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-                            } else {
-                                responseDTO.setCode(VarList.Bad_Gateway);
-                                responseDTO.setMessage("Error");
+                            }  else {
+                                responseDTO.setCode(VarList.Internal_Server_Error);
+                                responseDTO.setMessage("QR Generation Fail");
                                 responseDTO.setData(null);
-                                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_GATEWAY);
+                                return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
                             }
 
                         }else {
@@ -96,15 +96,16 @@ public class FuelTokenController {
                     return new ResponseEntity<>(responseDTO, HttpStatus.NOT_ACCEPTABLE);
                 }
             } else {
-                int res = fuelTokenService.generateTokenInFirstTime(fuelTokenDTO);
-                if (res == 201) {
+                int res  = fuelTokenService.generateTokenInFirstTime(fuelTokenDTO);
+
+                if (res==201) {
                     responseDTO.setCode(VarList.Created);
                     responseDTO.setMessage("success");
                     responseDTO.setData(fuelTokenDTO);
                     return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-                } else if (res == 404) {
+                } else if (res==404) {
                     responseDTO.setCode(VarList.Not_Found);
-                    responseDTO.setMessage("TokenID Already Use");
+                    responseDTO.setMessage("Username Already Use");
                     responseDTO.setData(null);
                     return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
                 } else {
@@ -123,5 +124,45 @@ public class FuelTokenController {
         }
 
     }
+    @GetMapping("/getAllTokenByUsername")
+    public ResponseEntity<ResponseDTO> getAllTokenByUsername(@RequestAttribute String username) {
+
+        try{
+
+            //System.out.println(role);
+            List<FuelTokenDTO> fuelTokenDTOS = fuelTokenService.getAllTokenByUsername(username);
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Success");
+            responseDTO.setData(fuelTokenDTOS);
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(e);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+    @GetMapping("/getAllQRandDetails")
+    public ResponseEntity<ResponseDTO> getAllQRandDetails(@RequestAttribute String username) {
+
+        try{
+
+            //System.out.println(role);
+            FuelTokenResponseDTO fuelTokenResponseDTO = fuelTokenService.getAllQRandDetails(username);
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Success");
+            responseDTO.setData(fuelTokenResponseDTO);
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(e);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
 
 }
