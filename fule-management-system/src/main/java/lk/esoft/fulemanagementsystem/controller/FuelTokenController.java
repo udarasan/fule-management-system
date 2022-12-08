@@ -162,6 +162,59 @@ public class FuelTokenController {
         }
 
     }
+    @GetMapping("/getAllTokenByFuelStationId")
+    public ResponseEntity<ResponseDTO> getAllTokenByFuelStationId(@RequestAttribute String username) {
+
+        try{
+
+            System.out.println(username);
+            List<FuelTokenDTO> fuelTokenDTOS = fuelTokenService.getAllTokenByFuelStationId(username);
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Success");
+            responseDTO.setData(fuelTokenDTOS);
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(e);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+    @GetMapping("/getAllTokens")
+    public ResponseEntity<ResponseDTO> getAllTokenByFuelSgetAllTokenstationId(@RequestAttribute String username) {
+
+        try{
+
+            List<FuelTokenDTO> fuelTokenDTOS = fuelTokenService.getAllTokens();
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Success");
+            responseDTO.setData(fuelTokenDTOS);
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(e);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+    @PutMapping("/changeTokenStatus")
+    public ResponseEntity<ResponseDTO> changePaymentStatus(@RequestParam int tid, @RequestParam String status) {
+        try {
+            fuelTokenService.changePaymentStatus(tid, status);
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Success");
+            responseDTO.setData(null);
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(e);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
 
 

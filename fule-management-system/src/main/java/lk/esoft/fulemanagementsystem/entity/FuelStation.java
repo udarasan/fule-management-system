@@ -29,5 +29,6 @@ public class FuelStation {
     private int customer_requested_limit;
     private String status;
     private int station_requested_limit;
+    private String username_fk;
 
 }

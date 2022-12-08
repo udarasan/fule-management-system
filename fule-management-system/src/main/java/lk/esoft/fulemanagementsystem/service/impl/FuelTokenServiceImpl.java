@@ -9,6 +9,7 @@ import lk.esoft.fulemanagementsystem.entity.User;
 import lk.esoft.fulemanagementsystem.entity.Vehicle;
 import lk.esoft.fulemanagementsystem.repository.FuelStationRepository;
 import lk.esoft.fulemanagementsystem.repository.FuelTokenRepository;
+import lk.esoft.fulemanagementsystem.repository.UserRepository;
 import lk.esoft.fulemanagementsystem.repository.VehicleRepository;
 import lk.esoft.fulemanagementsystem.service.FuelTokenService;
 import lk.esoft.fulemanagementsystem.util.QRCodeGenerator;
@@ -17,6 +18,7 @@ import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -46,6 +48,9 @@ public class FuelTokenServiceImpl implements FuelTokenService {
 
     @Autowired
     private FuelStationRepository fuelStationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
 
     @Override
@@ -188,7 +193,39 @@ public class FuelTokenServiceImpl implements FuelTokenService {
         return fuelTokenResponseDTO;
     }
 
-    private double fuelPriceCalculation(int requestQuota){
+    @Override
+    public List<FuelTokenDTO> getAllTokenByFuelStationId(String username) {
+        //get fuel station pK
+        int fid = fuelStationRepository.getFidByUserName(username);
+
+
+        //get token by id
+        List<FuelToken> fuelTokenDTOList = fuelTokenRepository.getAllTokenByFid(fid);
+
+        return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<FuelTokenDTO>>() {
+        }.getType());
+    }
+
+    @Override
+    public int changePaymentStatus(int tid, String status) {
+        if (fuelTokenRepository.existsById(tid)) {
+            fuelTokenRepository.changePaymentStatus(tid,status);
+            return VarList.Accepted;
+        } else {
+            return VarList.Not_Found;
+        }
+
+    }
+
+    @Override
+    public List<FuelTokenDTO> getAllTokens() {
+        List<FuelToken> fuelTokenDTOList = fuelTokenRepository.findAll(Sort.by(Sort.Direction.DESC, "tid"));
+
+        return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<FuelTokenDTO>>() {
+        }.getType());
+    }
+
+    private double fuelPriceCalculation(int requestQuota) {
         return requestQuota * BusinessLogicVarList.OneLiter;
     }
 

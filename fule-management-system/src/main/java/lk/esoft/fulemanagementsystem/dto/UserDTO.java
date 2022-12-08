@@ -23,5 +23,5 @@ public class UserDTO {
     private String email;
     private String name;
     private UserRoleDTO roleCode;
-    private List<VehicleDTO> vehicleNo;
+    /*private List<VehicleDTO> vehicleNo;*/
 }

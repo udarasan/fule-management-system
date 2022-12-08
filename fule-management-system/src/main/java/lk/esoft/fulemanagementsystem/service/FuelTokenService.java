@@ -29,4 +29,10 @@ public interface FuelTokenService {
 
 
     FuelTokenResponseDTO getAllQRandDetails(String username);
+
+    List<FuelTokenDTO> getAllTokenByFuelStationId(String username);
+
+    int changePaymentStatus(int tid, String status);
+
+    List<FuelTokenDTO> getAllTokens();
 }

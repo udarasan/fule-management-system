@@ -40,4 +40,6 @@ public interface FuelStationRepository extends JpaRepository<FuelStation,Integer
     }
 
 
+    @Query(value = "select fid from fuel_station where username_fk=?1",nativeQuery = true)
+    int getFidByUserName(String username);
 }
