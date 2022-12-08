@@ -1,5 +1,7 @@
 package lk.esoft.fulemanagementsystem.controller;
 
+import lk.esoft.fulemanagementsystem.dto.FuelStationDTO;
+import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
 import lk.esoft.fulemanagementsystem.dto.ResponseDTO;
 import lk.esoft.fulemanagementsystem.service.FuelStationService;
 import lk.esoft.fulemanagementsystem.service.FuelTokenService;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/fuelstation")
@@ -67,6 +71,24 @@ public class FuelStationController {
                 return new ResponseEntity<>(responseDTO, HttpStatus.BAD_GATEWAY);
             }
         } catch (Exception e) {
+            responseDTO.setCode(VarList.Internal_Server_Error);
+            responseDTO.setMessage(e.getMessage());
+            responseDTO.setData(e);
+            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+    @GetMapping("/getAllFuelStationDetails")
+    public ResponseEntity<ResponseDTO> getAllFuelStationDetails(@RequestAttribute String username) {
+
+        try{
+
+            List<FuelStationDTO> allFuelStationDetails = fuelStationService.getAllFuelStationDetails();
+            responseDTO.setCode(VarList.Created);
+            responseDTO.setMessage("Success");
+            responseDTO.setData(allFuelStationDetails);
+            return new ResponseEntity<>(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception e){
             responseDTO.setCode(VarList.Internal_Server_Error);
             responseDTO.setMessage(e.getMessage());
             responseDTO.setData(e);

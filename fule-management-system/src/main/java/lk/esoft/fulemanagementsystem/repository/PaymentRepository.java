@@ -10,4 +10,6 @@ public interface PaymentRepository extends JpaRepository<Payment,Integer> {
     @Modifying
     @Query(value = "UPDATE Payment SET payment_status = ?2 WHERE pid = ?1",nativeQuery = true)
     void changePaymentStatus(int pid,String status);
+
+
 }

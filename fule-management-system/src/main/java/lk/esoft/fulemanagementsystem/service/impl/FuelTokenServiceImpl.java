@@ -207,9 +207,9 @@ public class FuelTokenServiceImpl implements FuelTokenService {
     }
 
     @Override
-    public int changePaymentStatus(int tid, String status) {
+    public int changeTokenStatus(int tid, String status) {
         if (fuelTokenRepository.existsById(tid)) {
-            fuelTokenRepository.changePaymentStatus(tid,status);
+            fuelTokenRepository.changeTokenStatus(tid,status);
             return VarList.Accepted;
         } else {
             return VarList.Not_Found;

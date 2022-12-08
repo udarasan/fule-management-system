@@ -29,5 +29,7 @@ public interface FuelTokenRepository extends JpaRepository<FuelToken,Integer> {
 
     @Modifying
     @Query(value = "UPDATE fuel_token SET status = ?2 WHERE tid = ?1",nativeQuery = true)
-    void changePaymentStatus(int tid, String status);
+    void changeTokenStatus(int tid, String status);
+
+
 }

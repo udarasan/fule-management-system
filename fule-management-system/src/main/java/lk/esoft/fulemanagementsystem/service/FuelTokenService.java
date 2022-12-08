@@ -32,7 +32,7 @@ public interface FuelTokenService {
 
     List<FuelTokenDTO> getAllTokenByFuelStationId(String username);
 
-    int changePaymentStatus(int tid, String status);
+    int changeTokenStatus(int tid, String status);
 
     List<FuelTokenDTO> getAllTokens();
 }

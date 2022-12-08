@@ -200,9 +200,9 @@ public class FuelTokenController {
 
     }
     @PutMapping("/changeTokenStatus")
-    public ResponseEntity<ResponseDTO> changePaymentStatus(@RequestParam int tid, @RequestParam String status) {
+    public ResponseEntity<ResponseDTO> changeTokenStatus(@RequestParam int tid, @RequestParam String status) {
         try {
-            fuelTokenService.changePaymentStatus(tid, status);
+            fuelTokenService.changeTokenStatus(tid, status);
             responseDTO.setCode(VarList.Created);
             responseDTO.setMessage("Success");
             responseDTO.setData(null);
