@@ -12,6 +12,7 @@ import lk.esoft.fulemanagementsystem.repository.FuelTokenRepository;
 import lk.esoft.fulemanagementsystem.repository.UserRepository;
 import lk.esoft.fulemanagementsystem.repository.VehicleRepository;
 import lk.esoft.fulemanagementsystem.service.FuelTokenService;
+import lk.esoft.fulemanagementsystem.util.MailSender;
 import lk.esoft.fulemanagementsystem.util.QRCodeGenerator;
 import lk.esoft.fulemanagementsystem.util.VarList.BusinessLogicVarList;
 import lk.esoft.fulemanagementsystem.util.VarList.VarList;
@@ -19,11 +20,16 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,6 +41,9 @@ import java.util.List;
 @Service
 @Transactional
 public class FuelTokenServiceImpl implements FuelTokenService {
+
+    @Autowired
+    private JavaMailSender emailSender;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -70,9 +79,9 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             vehicle.setVehicle_no(fuelTokenDTO.getVehicleRegNo());
             vehicle.setAvailable_quota(newBalance);
             vehicle.setUsername_Fk(fuelTokenDTO.getUsernameFk().getUsername());
-            if(vehicleRepository.getUserName(fuelTokenDTO.getVehicleRegNo()).equals(fuelTokenDTO.getUsernameFk().getUsername())){
+            if (vehicleRepository.getUserName(fuelTokenDTO.getVehicleRegNo()).equals(fuelTokenDTO.getUsernameFk().getUsername())) {
                 vehicleRepository.save(vehicle);
-            }else {
+            } else {
                 return VarList.Not_Acceptable;
             }
 
@@ -213,12 +222,23 @@ public class FuelTokenServiceImpl implements FuelTokenService {
 
     @Override
     public int changeTokenStatus(int tid, String status) {
-        if (fuelTokenRepository.existsById(tid)) {
-            fuelTokenRepository.changeTokenStatus(tid,status);
-            return VarList.Accepted;
-        } else {
-            return VarList.Not_Found;
+        //MailSender mailSender=new MailSender();
+        try {
+            if (fuelTokenRepository.existsById(tid)) {
+                fuelTokenRepository.changeTokenStatus(tid, status);
+
+                FuelToken fuelToken = fuelTokenRepository.findById(tid).orElse(null);
+                System.out.println(fuelToken.getUsernameFk().getEmail());
+                sendMail(fuelToken.getUsernameFk().getEmail(), status, fuelToken.getFillingTimeAndDate(), fuelToken.getFuelStationFk().getStationName());
+
+                return VarList.Accepted;
+            } else {
+                return VarList.Not_Found;
+            }
+        } catch (Exception e) {
+            return 0;
         }
+
 
     }
 
@@ -232,6 +252,230 @@ public class FuelTokenServiceImpl implements FuelTokenService {
 
     private double fuelPriceCalculation(int requestQuota) {
         return requestQuota * BusinessLogicVarList.OneLiter;
+    }
+
+    public int sendMail(
+            String to, String status, Date dateAndTime, String fuelStation) throws MessagingException, IOException {
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("esoftassigmenets@gmail.com");
+            message.setTo(to);
+            switch (status) {
+                case "ACCEPTED":
+                    message.setSubject("Your Fuel Token ACCEPTED!");
+                    String atext = "<!DOCTYPE html>" +
+                            "<html>" +
+                            "<head>" +
+                            "<!-- HTML Codes by Quackit.com -->" +
+                            "<title>" +
+                            "</title>" +
+                            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                            "<style>" +
+                            "body {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\n" +
+                            "h1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\n" +
+                            "p {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n" +
+                            "</style>" +
+                            "</head>" +
+                            "<body>" +
+                            "<h1></h1>" +
+                            "<p>Hey " + to + ",</p>" +
+                            "<p></p>" +
+                            "<p>We are ACCEPTED Your Fuel Token Now!</p>" +
+                            "<!-- CSS Code: Place this code in the document's head (between the 'head' tags) -->\n" +
+                            "<style>" +
+                            "table.GeneratedTable {" +
+                            "  width: 100%;" +
+                            "  background-color: #ffffff;" +
+                            "  border-collapse: collapse;" +
+                            "  border-width: 2px;" +
+                            "  border-color: #ffcc00;" +
+                            "  border-style: solid;" +
+                            "  color: #000000;" +
+                            "}" +
+                            "" +
+                            "table.GeneratedTable td, table.GeneratedTable th {" +
+                            "  border-width: 2px;" +
+                            "  border-color: #ffcc00;" +
+                            "  border-style: solid;" +
+                            "  padding: 3px;" +
+                            "}" +
+                            "" +
+                            "table.GeneratedTable thead {" +
+                            "  background-color: #ffcc00;" +
+                            "}" +
+                            "</style>" +
+                            "" +
+                            "<!-- HTML Code: Place this code in the document's body (between the 'body' tags) where the table should appear -->\n" +
+                            "<table class=\"GeneratedTable\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>Date And Time</th>" +
+                            "      <th>Fuel Station</th>" +
+                            "    </tr>" +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            "    <tr>" +
+                            "      <td>"+dateAndTime+"</td>" +
+                            "      <td>"+fuelStation+"</td>" +
+                            "    </tr>" +
+                            "  </tbody>" +
+                            "</table>" +
+                            "<p></p>" +
+                            "<p>Thank You!</p>" +
+                            "<p>Power Fuel(pvt) Ltd</p>" +
+                            "</body>" +
+                            "</html>";
+                    message.setText(atext);
+                    System.out.println("------------------------------>");
+                    emailSender.send(message);
+                    System.out.println("------------------------------>");
+                    return VarList.Created;
+
+                case "DELIVERED":
+                    message.setSubject("Your Fuel Quota DELIVERED!");
+                    String dtext = "<!DOCTYPE html>" +
+                            "<html>" +
+                            "<head" +
+                            "<!-- HTML Codes by Quackit.com -->" +
+                            "<title>" +
+                            "</title>" +
+                            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                            "<style>" +
+                            "body {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\n" +
+                            "h1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\n" +
+                            "p {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n" +
+                            "</style>" +
+                            "</head>" +
+                            "<body>" +
+                            "<h1></h1>" +
+                            "<p>Hey " + to + ",</p>" +
+                            "<p></p>" +
+                            "<p>We are DELIVERED Your Fuel Quota To Your Fuel Station!</p>" +
+                            "<!-- CSS Code: Place this code in the document's head (between the 'head' tags) -->\n" +
+                            "<style>" +
+                            "table.GeneratedTable {" +
+                            "  width: 100%;" +
+                            "  background-color: #ffffff;" +
+                            "  border-collapse: collapse;" +
+                            "  border-width: 2px;" +
+                            "  border-color: #ffcc00;" +
+                            "  border-style: solid;" +
+                            "  color: #000000;" +
+                            "}" +
+                            "" +
+                            "table.GeneratedTable td, table.GeneratedTable th {" +
+                            "  border-width: 2px;" +
+                            "  border-color: #ffcc00;" +
+                            "  border-style: solid;" +
+                            "  padding: 3px;" +
+                            "}" +
+                            "" +
+                            "table.GeneratedTable thead {" +
+                            "  background-color: #ffcc00;" +
+                            "}" +
+                            "</style>" +
+                            "" +
+                            "<!-- HTML Code: Place this code in the document's body (between the 'body' tags) where the table should appear -->\n" +
+                            "<table class=\"GeneratedTable\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>Date And Time</th>" +
+                            "      <th>Fuel Station</th>" +
+                            "    </tr>" +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            "    <tr>" +
+                            "      <td>"+dateAndTime+"</td>" +
+                            "      <td>"+fuelStation+"</td>" +
+                            "    </tr>" +
+                            "  </tbody>" +
+                            "</table>" +
+                            "<p></p>" +
+                            "<p>Thank You!</p>" +
+                            "<p>Power Fuel(pvt) Ltd</p>" +
+                            "</body>" +
+                            "</html>";
+                    message.setText(dtext);
+                    System.out.println("------------------------------>");
+                    emailSender.send(message);
+                    System.out.println("------------------------------>");
+                    return VarList.Created;
+                case "CANCELED":
+                    message.setSubject("Your Fuel Token CANCELED!");
+                    String ctext = "<!DOCTYPE html>" +
+                            "<html>" +
+                            "<head>" +
+                            "<!-- HTML Codes by Quackit.com -->" +
+                            "<title>" +
+                            "</title>" +
+                            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+                            "<style>" +
+                            "body {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}" +
+                            "h1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}" +
+                            "p {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}" +
+                            "</style>" +
+                            "</head>" +
+                            "<body>" +
+                            "<h1></h1>" +
+                            "<p>Hey " + to + ",</p>" +
+                            "<p></p>" +
+                            "<p>We are CANCELED Your Fuel Token Now!</p>" +
+                            "<!-- CSS Code: Place this code in the document's head (between the 'head' tags) -->\n" +
+                            "<style>" +
+                            "table.GeneratedTable {" +
+                            "  width: 100%;" +
+                            "  background-color: #ffffff;" +
+                            "  border-collapse: collapse;" +
+                            "  border-width: 2px;" +
+                            "  border-color: #ffcc00;" +
+                            "  border-style: solid;" +
+                            "  color: #000000;" +
+                            "}" +
+                            "" +
+                            "table.GeneratedTable td, table.GeneratedTable th {" +
+                            "  border-width: 2px;" +
+                            "  border-color: #ffcc00;" +
+                            "  border-style: solid;" +
+                            "  padding: 3px;" +
+                            "}" +
+                            "" +
+                            "table.GeneratedTable thead {" +
+                            "  background-color: #ffcc00;" +
+                            "}" +
+                            "</style>" +
+                            "" +
+                            "<!-- HTML Code: Place this code in the document's body (between the 'body' tags) where the table should appear -->\n" +
+                            "<table class=\"GeneratedTable\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>Date And Time</th>" +
+                            "      <th>Fuel Station</th>" +
+                            "    </tr>" +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            "    <tr>" +
+                            "      <td>"+dateAndTime+"</td>" +
+                            "      <td>"+fuelStation+"</td>" +
+                            "    </tr>" +
+                            "  </tbody>" +
+                            "</table>" +
+                            "<p></p>" +
+                            "<p>Thank You!</p>" +
+                            "<p>Power Fuel(pvt) Ltd</p>" +
+                            "</body>" +
+                            "</html>";
+                    message.setText(ctext);
+                    System.out.println("------------------------------>");
+                    emailSender.send(message);
+                    System.out.println("------------------------------>");
+                    return VarList.Created;
+            }
+            return VarList.Conflict;
+        } catch (Exception e) {
+            System.out.println(e);
+            return VarList.Conflict;
+        }
     }
 
 }
