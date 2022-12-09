@@ -52,6 +52,11 @@ public class FuelTokenController {
                             responseDTO.setMessage("Username Already Use");
                             responseDTO.setData(null);
                             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+                        }else if (res==406) {
+                            responseDTO.setCode(VarList.Not_Acceptable);
+                            responseDTO.setMessage("Incorrect Username");
+                            responseDTO.setData(null);
+                            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_ACCEPTABLE);
                         }  else {
                             responseDTO.setCode(VarList.Internal_Server_Error);
                             responseDTO.setMessage("QR Generation Fail");
@@ -74,7 +79,12 @@ public class FuelTokenController {
                                 responseDTO.setMessage("Username Already Use");
                                 responseDTO.setData(null);
                                 return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-                            }  else {
+                            }  else if (res==406) {
+                                responseDTO.setCode(VarList.Not_Acceptable);
+                                responseDTO.setMessage("Incorrect Username");
+                                responseDTO.setData(null);
+                                return new ResponseEntity<>(responseDTO, HttpStatus.NOT_ACCEPTABLE);
+                            } else {
                                 responseDTO.setCode(VarList.Internal_Server_Error);
                                 responseDTO.setMessage("QR Generation Fail");
                                 responseDTO.setData(null);
@@ -202,6 +212,7 @@ public class FuelTokenController {
     @PutMapping("/changeTokenStatus")
     public ResponseEntity<ResponseDTO> changeTokenStatus(@RequestParam int tid, @RequestParam String status) {
         try {
+
             fuelTokenService.changeTokenStatus(tid, status);
             responseDTO.setCode(VarList.Created);
             responseDTO.setMessage("Success");

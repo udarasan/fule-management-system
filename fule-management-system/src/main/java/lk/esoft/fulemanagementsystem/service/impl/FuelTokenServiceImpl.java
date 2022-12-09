@@ -70,7 +70,12 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             vehicle.setVehicle_no(fuelTokenDTO.getVehicleRegNo());
             vehicle.setAvailable_quota(newBalance);
             vehicle.setUsername_Fk(fuelTokenDTO.getUsernameFk().getUsername());
-            vehicleRepository.save(vehicle);
+            if(vehicleRepository.getUserName(fuelTokenDTO.getVehicleRegNo()).equals(fuelTokenDTO.getUsernameFk().getUsername())){
+                vehicleRepository.save(vehicle);
+            }else {
+                return VarList.Not_Acceptable;
+            }
+
             //update fuel station available stock
             int stationAvailability = fuelStationRepository.getAvailableBalance(fuelTokenDTO.getFuelStationFk().getFid());
             int requestQuota = fuelTokenDTO.getRequestQuota();

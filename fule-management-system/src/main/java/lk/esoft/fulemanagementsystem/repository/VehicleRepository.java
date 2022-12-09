@@ -13,4 +13,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle,Integer> {
 
     @Query(value = "select available_quota  from vehicle where vehicle_no=?1",nativeQuery = true)
     int getAvailableBalance(Integer vehicleNo);
+
+    @Query(value = "select fulemgtsystem.vehicle.username_FK  from vehicle where vehicle_no=?1",nativeQuery = true)
+    String getUserName(Integer vehicleRegNo);
 }

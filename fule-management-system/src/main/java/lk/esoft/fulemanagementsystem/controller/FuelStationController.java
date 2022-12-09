@@ -82,7 +82,6 @@ public class FuelStationController {
     public ResponseEntity<ResponseDTO> getAllFuelStationDetails(@RequestAttribute String username) {
 
         try{
-
             List<FuelStationDTO> allFuelStationDetails = fuelStationService.getAllFuelStationDetails();
             responseDTO.setCode(VarList.Created);
             responseDTO.setMessage("Success");
