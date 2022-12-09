@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -28,5 +29,9 @@ public class MainFuelStockServiceImpl implements MainFuelStockService {
             mainFuelStockRepository.save(modelMapper.map(mainFuelStockDTO, MainFuelStock.class));
             return VarList.Created;
         }
+    }
+    public MainFuelStockDTO getMainFuelStock() {
+         MainFuelStock mainFuelStock=mainFuelStockRepository.findById(1).orElse(null);
+         return modelMapper.map(mainFuelStock,MainFuelStockDTO.class);
     }
 }
