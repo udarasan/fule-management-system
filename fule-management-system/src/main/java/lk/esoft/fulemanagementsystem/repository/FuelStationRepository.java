@@ -50,4 +50,7 @@ public interface FuelStationRepository extends JpaRepository<FuelStation,Integer
     @Modifying
     @Query(value = "update fuel_station set status=?1 where fid =?2",nativeQuery = true)
     void requestFuelStatusChange(String status, int fid);
+
+    @Query(value = "select * from fuel_station where username_fk=?1",nativeQuery = true)
+    FuelStation findAllByUsername(String username);
 }

@@ -2,6 +2,7 @@ package lk.esoft.fulemanagementsystem.service.impl;
 
 import lk.esoft.fulemanagementsystem.dto.FuelStationDTO;
 import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
+import lk.esoft.fulemanagementsystem.dto.UserDTO;
 import lk.esoft.fulemanagementsystem.entity.FuelStation;
 import lk.esoft.fulemanagementsystem.entity.FuelToken;
 import lk.esoft.fulemanagementsystem.repository.FuelStationRepository;
@@ -63,5 +64,12 @@ public class FuelStationServiceImpl implements FuelStationService {
 
         return modelMapper.map(fuelStations, new TypeToken<ArrayList<FuelStationDTO>>() {
         }.getType());
+    }
+
+    @Override
+    public FuelStationDTO getAllFuelStationDetailsByUsername(String username) {
+        FuelStation fuelStations = fuelStationRepository.findAllByUsername(username);
+
+        return modelMapper.map(fuelStations, FuelStationDTO.class);
     }
 }

@@ -11,4 +11,6 @@ public interface FuelStationService {
     int requestFuelStatusChange(String status, String username);
 
     List<FuelStationDTO> getAllFuelStationDetails();
+   FuelStationDTO getAllFuelStationDetailsByUsername(String username);
+
 }
