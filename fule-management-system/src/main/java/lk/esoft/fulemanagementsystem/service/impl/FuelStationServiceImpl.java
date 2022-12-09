@@ -34,9 +34,18 @@ public class FuelStationServiceImpl implements FuelStationService {
         int fid = fuelStationRepository.getFidByUserName(username);
 
         if (fuelStationRepository.existsById(fid)) {
-            fuelStationRepository.requestFuel(fid,quota);
-            auditService.saveAudit("requestFuel","PASS:Fuel Station:("+""+fid+") requested Fuel Quota:"+quota);
-            return VarList.Accepted;
+            FuelStation fuelStation=fuelStationRepository.findAllByUsername(username);
+            if (fuelStation.getMax_limit()<=quota){
+                fuelStationRepository.requestFuel(fid,quota);
+
+                auditService.saveAudit("requestFuel","PASS:Fuel Station:("+""+fid+") requested Fuel Quota:"+quota);
+                return VarList.Accepted;
+            }else {
+                auditService.saveAudit("requestFuel","Fail:Fuel Station:("+""+fid+") requested Fuel Quota:"+quota +"Is Exceed MaxLimit");
+                return VarList.Not_Acceptable;
+            }
+
+
         } else {
             auditService.saveAudit("requestFuel","FAIL:Fuel Station:("+""+fid+") requested Fuel Quota:"+quota);
             return VarList.Not_Found;
