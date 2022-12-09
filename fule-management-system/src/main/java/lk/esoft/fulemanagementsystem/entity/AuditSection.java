@@ -5,18 +5,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
-@Table(name = "audit")
+@Table(name = "audit_section")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Audit {
+public class AuditSection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int aid;
-    private Date date;
-    private String function;
-    private String message;
+    private Integer aids;
+    private String dates;
+    private String functions;
+    private String messages;
 }

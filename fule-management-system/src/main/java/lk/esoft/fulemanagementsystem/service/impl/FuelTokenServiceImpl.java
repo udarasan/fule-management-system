@@ -41,7 +41,8 @@ import java.util.List;
 @Service
 @Transactional
 public class FuelTokenServiceImpl implements FuelTokenService {
-
+    @Autowired
+    private AuditServiceImpl auditService;
     @Autowired
     private JavaMailSender emailSender;
 
@@ -69,6 +70,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
 
         if (fuelTokenRepository.existsById(fuelTokenDTO.getTid())) {
             //fuelTokenResponseDTO.setQrString(null);
+            auditService.saveAudit("generateToken","FAIL:Generate Fuel Token"+fuelTokenDTO.getVehicleRegNo());
             return VarList.Not_Found;
         } else {
 
@@ -82,6 +84,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             if (vehicleRepository.getUserName(fuelTokenDTO.getVehicleRegNo()).equals(fuelTokenDTO.getUsernameFk().getUsername())) {
                 vehicleRepository.save(vehicle);
             } else {
+                auditService.saveAudit("generateToken","FAIL:Generate Fuel Token"+fuelTokenDTO.getVehicleRegNo()+"Wrong Username");
                 return VarList.Not_Acceptable;
             }
 
@@ -107,6 +110,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }*/
+            auditService.saveAudit("generateToken","PASS:Fuel Token Generation Pass"+fuelTokenDTO.getVehicleRegNo());
             return VarList.Created;
         }
     }
@@ -119,6 +123,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
                 fuelTokenDTO.getVehicleRegNo().toString() + "" +
                 fuelTokenDTO.getFuelStationFk().getFid().toString() + "" +
                 fuelTokenDTO.getPidFk().getPid().toString() + "" + fuelTokenDTO.getUsernameFk().getUsername() + "";
+        auditService.saveAudit("generateQRString","PASS:Generate QR String"+fuelTokenDTO.getVehicleRegNo());
         return s;
     }
 
@@ -127,6 +132,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
         FuelTokenResponseDTO fuelTokenResponseDTO = new FuelTokenResponseDTO();
         if (fuelTokenRepository.existsById(fuelTokenDTO.getTid())) {
             //fuelTokenResponseDTO.setQrString(null);
+            auditService.saveAudit("generateTokenInFirstTime","FAIL:Fist Time Generate Fuel Token"+fuelTokenDTO.getVehicleRegNo());
             return VarList.Not_Found;
         } else {
             Vehicle vehicle = new Vehicle();
@@ -145,24 +151,29 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }*/
+
+            auditService.saveAudit("generateTokenInFirstTime","PASS:Fist Time Generate Fuel Token"+fuelTokenDTO.getVehicleRegNo());
             return VarList.Created;
         }
     }
 
     @Override
     public int getAvailableBalance(Integer vehicleRegNo) {
+        auditService.saveAudit("getAvailableBalance","PASS:Get Available Balance"+vehicleRegNo);
 
         return vehicleRepository.getAvailableBalance(vehicleRegNo);
     }
 
     @Override
     public boolean vehicleRegNoExists(Integer vehicleRegNo) {
+        auditService.saveAudit("vehicleRegNoExists","PASS:Vehicle Reg No Exits"+vehicleRegNo);
         return fuelTokenRepository.existsByVehicleRegNo(vehicleRegNo);
 
     }
 
     @Override
     public int getAvailableBalanceInStation(Integer fid) {
+        auditService.saveAudit("getAvailableBalanceInStation","PASS:GET Available Balance In Station"+fid);
         return fuelStationRepository.getAvailableBalance(fid);
     }
 
@@ -171,8 +182,10 @@ public class FuelTokenServiceImpl implements FuelTokenService {
         HashMap<String, Object> map = fuelStationRepository.checkFuelRequestAvailability(fid);
 
         if (map.get("status").equals("ACCEPTED")) {
+            auditService.saveAudit("checkFuelRequestAvailability","PASS:Check Fuel Request Availability"+fid);
             return true;
         } else {
+            auditService.saveAudit("checkFuelRequestAvailability","FAIL:Check Fuel Request Availability"+fid);
             return false;
         }
     }
@@ -181,7 +194,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
     public List<FuelTokenDTO> getAllTokenByUsername(String username) {
 
         List<FuelToken> fuelTokenDTOList = fuelTokenRepository.getAllTokenByUsername(username);
-
+        auditService.saveAudit("getAllTokenByUsername","PASS:Get All Token By Username"+username);
         return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<FuelTokenDTO>>() {
         }.getType());
 
@@ -204,6 +217,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
             ioException.printStackTrace();
         }
 
+        auditService.saveAudit("getAllQRandDetails","PASS:Get All QR And Details"+username);
         return fuelTokenResponseDTO;
     }
 
@@ -216,6 +230,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
         //get token by id
         List<FuelToken> fuelTokenDTOList = fuelTokenRepository.getAllTokenByFid(fid);
 
+        auditService.saveAudit("getAllTokenByFuelStationId","PASS:Get All Token By FuelStationId"+username);
         return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<FuelTokenDTO>>() {
         }.getType());
     }
@@ -231,11 +246,14 @@ public class FuelTokenServiceImpl implements FuelTokenService {
                 System.out.println(fuelToken.getUsernameFk().getEmail());
                 sendMail(fuelToken.getUsernameFk().getEmail(), status, fuelToken.getFillingTimeAndDate(), fuelToken.getFuelStationFk().getStationName());
 
+                auditService.saveAudit("changeTokenStatus","PASS:Change Token Status :"+status);
                 return VarList.Accepted;
             } else {
+                auditService.saveAudit("changeTokenStatus","FAIL:Change Token Status :"+status);
                 return VarList.Not_Found;
             }
         } catch (Exception e) {
+            auditService.saveAudit("changeTokenStatus","FAIL:Change Token Status :"+status +"Exception");
             return 0;
         }
 
@@ -245,7 +263,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
     @Override
     public List<FuelTokenDTO> getAllTokens() {
         List<FuelToken> fuelTokenDTOList = fuelTokenRepository.findAll(Sort.by(Sort.Direction.DESC, "tid"));
-
+        auditService.saveAudit("getAllTokens","PASS:Get All Token :");
         return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<FuelTokenDTO>>() {
         }.getType());
     }
@@ -330,6 +348,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
                     System.out.println("------------------------------>");
                     emailSender.send(message);
                     System.out.println("------------------------------>");
+                    auditService.saveAudit("sendMail","PASS:ACCEPTED Mail Send");
                     return VarList.Created;
 
                 case "DELIVERED":
@@ -400,6 +419,7 @@ public class FuelTokenServiceImpl implements FuelTokenService {
                     System.out.println("------------------------------>");
                     emailSender.send(message);
                     System.out.println("------------------------------>");
+                    auditService.saveAudit("sendMail","PASS:DELIVERED Mail Send");
                     return VarList.Created;
                 case "CANCELED":
                     message.setSubject("Your Fuel Token CANCELED!");
@@ -469,11 +489,13 @@ public class FuelTokenServiceImpl implements FuelTokenService {
                     System.out.println("------------------------------>");
                     emailSender.send(message);
                     System.out.println("------------------------------>");
+                    auditService.saveAudit("sendMail","PASS:CANCELED Mail Send");
                     return VarList.Created;
             }
             return VarList.Conflict;
         } catch (Exception e) {
             System.out.println(e);
+            auditService.saveAudit("sendMail","FAIL:Exception");
             return VarList.Conflict;
         }
     }

@@ -1,12 +1,8 @@
 package lk.esoft.fulemanagementsystem.service.impl;
 
 import lk.esoft.fulemanagementsystem.dto.FuelStationDTO;
-import lk.esoft.fulemanagementsystem.dto.FuelTokenDTO;
-import lk.esoft.fulemanagementsystem.dto.UserDTO;
 import lk.esoft.fulemanagementsystem.entity.FuelStation;
-import lk.esoft.fulemanagementsystem.entity.FuelToken;
 import lk.esoft.fulemanagementsystem.repository.FuelStationRepository;
-import lk.esoft.fulemanagementsystem.repository.UserRepository;
 import lk.esoft.fulemanagementsystem.service.FuelStationService;
 import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.modelmapper.ModelMapper;
@@ -23,7 +19,7 @@ import java.util.List;
 public class FuelStationServiceImpl implements FuelStationService {
 
     @Autowired
-    private UserRepository userRepository;
+    private AuditServiceImpl auditService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -39,8 +35,10 @@ public class FuelStationServiceImpl implements FuelStationService {
 
         if (fuelStationRepository.existsById(fid)) {
             fuelStationRepository.requestFuel(fid,quota);
+            auditService.saveAudit("requestFuel","PASS:Fuel Station:("+""+fid+") requested Fuel Quota:"+quota);
             return VarList.Accepted;
         } else {
+            auditService.saveAudit("requestFuel","FAIL:Fuel Station:("+""+fid+") requested Fuel Quota:"+quota);
             return VarList.Not_Found;
         }
     }
@@ -52,8 +50,10 @@ public class FuelStationServiceImpl implements FuelStationService {
 
         if (fuelStationRepository.existsById(fid)) {
             fuelStationRepository.requestFuelStatusChange(status,fid);
+            auditService.saveAudit("requestFuelStatusChange","PASS:Fuel Station:("+""+fid+") requested Fuel Status Change:"+status);
             return VarList.Accepted;
         } else {
+            auditService.saveAudit("requestFuelStatusChange","FAIL:Fuel Station:("+""+fid+") requested Fuel  Status Change:"+status);
             return VarList.Not_Found;
         }
     }
@@ -62,6 +62,7 @@ public class FuelStationServiceImpl implements FuelStationService {
     public List<FuelStationDTO> getAllFuelStationDetails() {
         List<FuelStation> fuelStations = fuelStationRepository.findAll();
 
+        auditService.saveAudit("getAllFuelStationDetails","PASS:Get All Fuel Stations Details");
         return modelMapper.map(fuelStations, new TypeToken<ArrayList<FuelStationDTO>>() {
         }.getType());
     }
@@ -69,7 +70,7 @@ public class FuelStationServiceImpl implements FuelStationService {
     @Override
     public FuelStationDTO getAllFuelStationDetailsByUsername(String username) {
         FuelStation fuelStations = fuelStationRepository.findAllByUsername(username);
-
+        auditService.saveAudit("getAllFuelStationDetailsByUsername","PASS:Get All Fuel Stations Details Using Username :"+username);
         return modelMapper.map(fuelStations, FuelStationDTO.class);
     }
 }

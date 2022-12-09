@@ -28,6 +28,8 @@ public class UserServiceImpl implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuditServiceImpl auditService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -36,10 +38,13 @@ public class UserServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
+        auditService.saveAudit("loadUserByUsername","PASS:Load User By User Name"+username);
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority(user));
     }
     public UserDTO loadUserDetailsByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
+        auditService.saveAudit("loadUserDetailsByUsername","PASS:Load User Detail By User Name"+username);
+
         return modelMapper.map(user,UserDTO.class);
     }
 
@@ -51,9 +56,11 @@ public class UserServiceImpl implements UserDetailsService {
 
     public int saveUser(UserDTO userDTO) {
         if (userRepository.existsByUsername(userDTO.getUsername())) {
+            auditService.saveAudit("saveUser","PASS:Save User Now"+userDTO.getName());
             return VarList.Not_Found;
         } else {
             userRepository.save(modelMapper.map(userDTO, User.class));
+            auditService.saveAudit("saveUser","FAIL:Save User Now"+userDTO.getName());
             return VarList.Created;
         }
     }

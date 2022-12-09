@@ -18,15 +18,18 @@ public class MainFuelStockServiceImpl implements MainFuelStockService {
     @Autowired
     private MainFuelStockRepository mainFuelStockRepository;
 
-
+    @Autowired
+    private AuditServiceImpl auditService;
     @Autowired
     private ModelMapper modelMapper;
 
     public int saveMainFuelStock(MainFuelStockDTO mainFuelStockDTO) {
         if (mainFuelStockRepository.existsById(mainFuelStockDTO.getMfs_id())) {
+            auditService.saveAudit("saveMainFuelStock","PASS:Save Main Fuel Stock "+mainFuelStockDTO.getMain_stock());
             return VarList.Not_Found;
         } else {
             mainFuelStockRepository.save(modelMapper.map(mainFuelStockDTO, MainFuelStock.class));
+            auditService.saveAudit("saveMainFuelStock","FAIL:Save Main Fuel Stock "+mainFuelStockDTO.getMain_stock());
             return VarList.Created;
         }
     }
