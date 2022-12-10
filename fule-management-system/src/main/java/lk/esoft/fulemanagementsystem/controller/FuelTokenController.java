@@ -157,7 +157,6 @@ public class FuelTokenController {
     public ResponseEntity<ResponseDTO> getAllQRandDetails(@RequestAttribute String username) {
 
         try{
-
             //System.out.println(role);
             FuelTokenResponseDTO fuelTokenResponseDTO = fuelTokenService.getAllQRandDetails(username);
             responseDTO.setCode(VarList.Created);

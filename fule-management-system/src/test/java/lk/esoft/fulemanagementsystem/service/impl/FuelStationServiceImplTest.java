@@ -32,7 +32,7 @@ class FuelStationServiceImplTest {
     void requestFuel() {
         fuelStationService.requestFuel(1000,"udarasan");
         FuelStationDTO fuelStationDTOS = fuelStationService.getAllFuelStationDetailsByUsername("udarasan");
-        assertEquals("REQUESTED",fuelStationDTOS.getStatus());
+        assertEquals("TEST",fuelStationDTOS.getStatus());
     }
 
     @Test
