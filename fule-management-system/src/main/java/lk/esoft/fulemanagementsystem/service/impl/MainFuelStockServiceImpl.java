@@ -1,15 +1,18 @@
 package lk.esoft.fulemanagementsystem.service.impl;
 
+import lk.esoft.fulemanagementsystem.dto.FuelStationDTO;
 import lk.esoft.fulemanagementsystem.dto.MainFuelStockDTO;
 import lk.esoft.fulemanagementsystem.entity.MainFuelStock;
 import lk.esoft.fulemanagementsystem.repository.MainFuelStockRepository;
 import lk.esoft.fulemanagementsystem.service.MainFuelStockService;
 import lk.esoft.fulemanagementsystem.util.VarList.VarList;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,5 +39,13 @@ public class MainFuelStockServiceImpl implements MainFuelStockService {
     public MainFuelStockDTO getMainFuelStock() {
          MainFuelStock mainFuelStock=mainFuelStockRepository.findById(1).orElse(null);
          return modelMapper.map(mainFuelStock,MainFuelStockDTO.class);
+    }
+
+
+    public List<MainFuelStockDTO> getMainStockDetails() {
+        List<MainFuelStock> fuelTokenDTOList = mainFuelStockRepository.findAll();
+        auditService.saveAudit("getMainStockDetails","PASS:Get All Stock details For admin panel");
+        return modelMapper.map(fuelTokenDTOList, new TypeToken<ArrayList<MainFuelStockDTO>>() {
+        }.getType());
     }
 }

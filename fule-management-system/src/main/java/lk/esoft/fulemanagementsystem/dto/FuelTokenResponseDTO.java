@@ -13,3 +13,4 @@ public class FuelTokenResponseDTO {
     private int availableQuota;
     private int fullQuota=20;
 }
+
